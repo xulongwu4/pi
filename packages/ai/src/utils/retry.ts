@@ -66,6 +66,8 @@ const RETRYABLE_PROVIDER_ERROR_PATTERN = buildProviderErrorPattern([
 	"connection.?lost",
 	"other side closed",
 	"fetch failed",
+	// node-fetch wraps system failures using this wording (#3218).
+	"request to .* failed, reason:",
 	"getaddrinfo",
 	"ENOTFOUND",
 	"EAI_AGAIN",

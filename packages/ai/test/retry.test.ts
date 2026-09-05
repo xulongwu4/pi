@@ -14,6 +14,7 @@ const wrappedDnsLookupError =
 	"The pending stream has been canceled (caused by: getaddrinfo ENOTFOUND bedrock-runtime.us-east-1.amazonaws.com)";
 const azurePeakLoadError =
 	"The system is currently experiencing high demand and cannot process your request. Your request exceeds the maximum usage size allowed during peak load. For improved capacity reliability, consider switching to Provisioned Throughput.";
+const nodeFetchRequestFailedMessage = "request to https://oauth2.googleapis.com/token failed, reason:";
 
 describe("provider retry classification", () => {
 	it("matches explicit provider retry guidance", () => {
@@ -77,6 +78,15 @@ describe("provider retry classification", () => {
 		"Service unavailable: The service is temporarily unavailable.",
 	])("matches service unavailable wording: %s", (errorMessage) => {
 		expect(isRetryableAssistantError(fauxAssistantMessage("", { stopReason: "error", errorMessage }))).toBe(true);
+	});
+
+	// Regression test for #3218.
+	it("matches node-fetch system transport failure wording", () => {
+		expect(
+			isRetryableAssistantError(
+				fauxAssistantMessage("", { stopReason: "error", errorMessage: nodeFetchRequestFailedMessage }),
+			),
+		).toBe(true);
 	});
 
 	it("matches OpenAI Responses streams that end before terminal events", () => {
